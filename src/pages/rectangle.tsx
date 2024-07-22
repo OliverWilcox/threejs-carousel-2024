@@ -70,6 +70,8 @@ const curvedFragmentShader = `
 
 export const Rectangle: React.FC<RectangleProps> = React.memo(
   ({ index, totalRectangles, scrollProgress, config, onCenterFocus }) => {
+    Rectangle.displayName = "Rectangle";
+
     const mesh = useRef<THREE.Mesh>(null);
     const [hovered, setHovered] = useState(false);
     const [isCenter, setIsCenter] = useState(false);

@@ -6,3 +6,4 @@ export const Lights: React.FC = React.memo(() => (
     <directionalLight position={[10, 10, 5]} intensity={1} />
   </>
 ));
+Lights.displayName = "Lights";

@@ -36,3 +36,5 @@ export const Scene: React.FC<SceneProps> = React.memo(
     return <>{rectangles}</>;
   }
 );
+
+Scene.displayName = "Scene";
