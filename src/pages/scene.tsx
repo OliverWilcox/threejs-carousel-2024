@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
-import { Rectangle } from "./rectangle";
-import { SceneProps } from "./types";
+import Rectangle from "./rectangle";
+import { SceneProps } from "../types";
 
 export const Scene: React.FC<SceneProps> = React.memo(
   ({ config, scrollProgress, onCenterFocus }) => {
@@ -26,7 +26,6 @@ export const Scene: React.FC<SceneProps> = React.memo(
             totalRectangles={totalRectangles}
             scrollProgress={scrollProgress}
             config={config}
-            animationIntensity={animationIntensity}
             onCenterFocus={onCenterFocus}
           />
         );

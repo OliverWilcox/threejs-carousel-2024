@@ -14,7 +14,7 @@ import gsap from "gsap";
 // Importing components and types
 import { Scene } from "./scene";
 import { Lights } from "./lights";
-import { AppProps, ConfigType } from "./types";
+import { AppProps, ConfigType } from "../types";
 
 // Nav component
 const Nav: React.FC<{ currentProject: number }> = ({ currentProject }) => {
@@ -31,6 +31,7 @@ const Nav: React.FC<{ currentProject: number }> = ({ currentProject }) => {
         justifyContent: "space-between",
         color: "black",
         zIndex: 40,
+        visibility: "hidden",
       }}
     >
       <div>Oliver Wilcox</div>
@@ -142,20 +143,18 @@ const Info: React.FC<{ currentProject: number; isVisible: boolean }> = ({
 }) => {
   const projects = [
     {
-      name: "Relationship Ready",
-      date: "2021",
-      client: "Coaching",
+      name: "Index 1",
+      date: "2024",
+      client: "Index 1",
       role: "Design and Development",
-      description:
-        "Developed a new experience designed to help with building dyson spheres.",
+      description: "Description 1",
     },
     {
-      name: "Multivitamin Studio",
-      date: "2023",
-      client: "Web Agency",
-      role: "Design and Creative Development",
-      description:
-        "Created an immersive web experience showcasing the latest advancements.",
+      name: "Index 2",
+      date: "2024",
+      client: "Index 2",
+      role: "Design and Development",
+      description: "Description 2",
     },
 
     // Add more projects as needed

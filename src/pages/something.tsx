@@ -14,7 +14,7 @@ import gsap from "gsap";
 // Importing components and types
 import { Scene } from "./scene";
 import { Lights } from "./lights";
-import { AppProps, ConfigType } from "./types";
+import { AppProps, ConfigType } from "../types";
 
 // Nav component
 const Nav: React.FC<{ currentProject: number }> = ({ currentProject }) => {
