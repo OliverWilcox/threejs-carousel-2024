@@ -375,7 +375,7 @@ const App: React.FC<AppProps> = ({ children }) => {
       const touchEnd = event.touches[0].clientY;
       const delta = touchLastRef.current - touchEnd;
 
-      updateScroll(delta * config.scrollSensitivity * 0.5);
+      updateScroll(delta * config.scrollSensitivity * 10);
 
       touchLastRef.current = touchEnd;
     };
@@ -455,7 +455,7 @@ const App: React.FC<AppProps> = ({ children }) => {
           shadows
           camera={{
             position: [0, 0, config.cameraZ],
-            fov: isMobile ? 80 : 120,
+            fov: isMobile ? 90 : 120,
           }}
           style={{
             width: "100%",
