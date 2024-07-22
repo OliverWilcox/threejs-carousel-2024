@@ -17,17 +17,50 @@
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  color: black;
+  background: white;
+  font-family: "Satoshi-Medium", Arial;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+@font-face {
+  font-family: "Satoshi-Bold";
+  src: url("/public/fonts/Satoshi-Bold.otf");
+}
+@font-face {
+  font-family: "Satoshi-SemiBold";
+  src: url("/public/fonts/Satoshi-SemiBold.otf");
+}
+@font-face {
+  font-family: "Satoshi-Light";
+  src: url("/public/fonts/Satoshi-Light.otf");
+}
+@font-face {
+  font-family: "Satoshi-Black";
+  src: url("/public/fonts/Satoshi-Black.otf");
+}
+
+@font-face {
+  font-family: "Satoshi-Medium";
+  src: url("/public/fonts/Satoshi-Medium.otf");
+}
+@font-face {
+  font-family: "Satoshi-Regular";
+  src: url("/public/fonts/Satoshi-Regular.otf");
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+html {
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
 }

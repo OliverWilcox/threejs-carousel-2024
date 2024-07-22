@@ -30,7 +30,7 @@ const Nav: React.FC<{ currentProject: number }> = ({ currentProject }) => {
         fontSize: "16px",
         justifyContent: "space-between",
         color: "black",
-        zIndex: 40,
+        zIndex: 10,
       }}
     >
       <div>Oliver Wilcox</div>
@@ -39,12 +39,7 @@ const Nav: React.FC<{ currentProject: number }> = ({ currentProject }) => {
   );
 };
 
-// Helper function to check for descending letters
-const hasDescendingLetters = (text: string): boolean => {
-  return /[gjpqy]/.test(text);
-};
-
-// AnimatedText component
+// Updated AnimatedText component
 const AnimatedText: React.FC<{
   children: ReactNode;
   splitLines?: boolean;
@@ -53,16 +48,14 @@ const AnimatedText: React.FC<{
   fontSize?: string;
   lineHeight?: string;
   delay?: number;
-  lines?: number;
 }> = ({
   children,
   splitLines = false,
   animationKey,
   isVisible,
   fontSize = "16px",
-  lineHeight = "1.8em",
+  lineHeight = "1.5em",
   delay = 0.2,
-  lines = 1,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<gsap.core.Timeline | null>(null);
@@ -71,34 +64,39 @@ const AnimatedText: React.FC<{
     if (containerRef.current) {
       const elements = containerRef.current.querySelectorAll("div > div");
 
+      // Kill any ongoing animation
       if (animationRef.current) {
         animationRef.current.kill();
       }
 
+      // Create a new timeline
       animationRef.current = gsap.timeline();
 
       if (isVisible) {
+        // Animate in
         animationRef.current
           .set(elements, { y: "100%", opacity: 0 })
           .to(elements, {
             y: "0%",
             opacity: 1,
             duration: 0.6,
-            delay: 0.3,
-            ease: "expo.out",
+            delay: delay,
+            ease: "power2.out",
             stagger: 0.025,
           });
       } else {
+        // Animate out
         animationRef.current.to(elements, {
-          y: "80%",
+          y: "-100%",
           opacity: 0,
-          duration: 0.5,
-          ease: "expo.in",
-          stagger: 0.025,
+          duration: 0.2,
+          ease: "power2.in",
+          stagger: 0,
         });
       }
     }
 
+    // Cleanup function
     return () => {
       if (animationRef.current) {
         animationRef.current.kill();
@@ -106,24 +104,22 @@ const AnimatedText: React.FC<{
     };
   }, [animationKey, isVisible, delay]);
 
-  if (lines > 1 && typeof children === "string") {
+  if (splitLines && typeof children === "string") {
     const words = children.split(" ");
-    const linesArray = [];
-    const wordsPerLine = Math.ceil(words.length / lines);
-
-    for (let i = 0; i < lines; i++) {
-      linesArray.push(
-        words.slice(i * wordsPerLine, (i + 1) * wordsPerLine).join(" ")
-      );
-    }
+    const midpoint = Math.ceil(words.length / 2);
+    const firstLine = words.slice(0, midpoint).join(" ");
+    const secondLine = words.slice(midpoint).join(" ");
 
     return (
       <div ref={containerRef}>
-        {linesArray.map((line, index) => (
-          <div key={index} style={{ overflow: "hidden", height: lineHeight }}>
-            <div style={{ fontSize }}>{line}</div>
-          </div>
-        ))}
+        <div style={{ overflow: "hidden", height: lineHeight }}>
+          <div style={{ fontSize }}>{firstLine}</div>
+        </div>
+        <div
+          style={{ overflow: "hidden", height: lineHeight, marginTop: "-2px" }}
+        >
+          <div style={{ fontSize }}>{secondLine}</div>
+        </div>
       </div>
     );
   }
@@ -142,126 +138,121 @@ const Info: React.FC<{ currentProject: number; isVisible: boolean }> = ({
 }) => {
   const projects = [
     {
-      name: "Relationship Ready",
+      name: "Project One",
       date: "2021",
       client: "Coaching",
       role: "Design and Development",
       description:
-        "Developed a new experience designed to help with building dyson spheres.",
+        "Developed a new experience designed to help with building dyson spheres",
     },
     {
-      name: "Multivitamin Studio",
+      name: "Project Two",
       date: "2023",
       client: "Web Agency",
       role: "Design and Creative Development",
       description:
-        "Created an immersive web experience showcasing the latest advancements.",
+        "Developed a new experience designed to help with building dyson spheres",
     },
-
+    {
+      name: "Project Three",
+      date: "2022",
+      client: "Record Label",
+      role: "Product Design",
+      description:
+        "Developed a new experience designed to help with building dyson spheres",
+    },
+    {
+      name: "Project Four",
+      date: "2024",
+      client: "Railway Company",
+      role: "Creative Dev and Design",
+      description:
+        "Developed a new experience designed to help with building dyson spheres",
+    },
     // Add more projects as needed
   ];
 
   const project = projects[currentProject % projects.length];
-  const projectNameLineHeight = hasDescendingLetters(project.name)
-    ? "5.4em"
-    : "5.05em";
 
   return (
     <>
-      {/* Centered project name */}
+      {/* Centered project title */}
       <div
         style={{
           position: "fixed",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          textAlign: "center",
-          zIndex: 10,
-          display: "none",
+          zIndex: 20,
         }}
       >
         <AnimatedText
-          lineHeight={projectNameLineHeight}
           animationKey={currentProject}
           isVisible={isVisible}
-          fontSize="64px"
-          delay={0}
+          fontSize="90px"
+          lineHeight="130px" // Increased to prevent "J" from being cut off
+          delay={0} // Reduced delay for project name
         >
           {project.name}
         </AnimatedText>
       </div>
 
-      {/* Bottom left text */}
+      {/* Other info at the bottom */}
       <div
         style={{
           position: "fixed",
-          bottom: "20px",
-          left: "20px",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: "20px",
+          display: "flex",
+          justifyContent: "space-between",
           color: "black",
           zIndex: 10,
-          visibility: "hidden",
         }}
       >
-        <AnimatedText
-          animationKey="developer-designer"
-          isVisible={isVisible}
-          fontSize="16px"
+        <div
+          style={{ fontSize: "16px", display: "flex", alignItems: "flex-end" }}
         >
-          Developer and Designer
-        </AnimatedText>
-      </div>
-
-      {/* Bottom centered description */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          textAlign: "center",
-          color: "black",
-          zIndex: 10,
-          width: "30%",
-          maxWidth: "400px",
-          visibility: "hidden",
-        }}
-      >
-        <AnimatedText
-          animationKey={currentProject}
-          isVisible={isVisible}
-          fontSize="13px"
-          lineHeight="1.2em"
-          lines={3}
-        >
-          {project.description}
-        </AnimatedText>
-      </div>
-
-      {/* Bottom right aligned details */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
-          textAlign: "right",
-          color: "black",
-          zIndex: 10,
-        }}
-      >
-        {["date", "client", "role"].map((field) => (
-          <AnimatedText
-            key={field}
-            animationKey={`${currentProject}-${field}`}
-            isVisible={isVisible}
-            fontSize="13px"
-            lineHeight="1.2em"
+          <span style={{ opacity: 1 }}>Email</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "flex-end" }}>
+          <div
+            style={{
+              fontSize: "13px",
+              marginRight: "30px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-end",
+            }}
           >
-            <span style={{ opacity: 0.5 }}>
-              {field.charAt(0).toUpperCase() + field.slice(1)}:
-            </span>{" "}
-            {project[field as keyof typeof project]}
-          </AnimatedText>
-        ))}
+            <AnimatedText
+              animationKey={currentProject}
+              splitLines={true}
+              isVisible={isVisible}
+              fontSize="13px"
+              lineHeight="1.5em"
+            >
+              {project.description}
+            </AnimatedText>
+          </div>
+          <div style={{ fontSize: "13px" }}>
+            {["date", "client", "role"].map((field) => (
+              <AnimatedText
+                key={field}
+                animationKey={`${currentProject}-${field}`}
+                isVisible={isVisible}
+                fontSize="13px"
+                lineHeight="1.5em"
+              >
+                <span style={{ opacity: 0.5 }}>
+                  {field.charAt(0).toUpperCase() + field.slice(1)}:
+                </span>{" "}
+                {project[field as keyof typeof project]}
+              </AnimatedText>
+            ))}
+          </div>
+        </div>
       </div>
     </>
   );
@@ -274,7 +265,7 @@ const App: React.FC<AppProps> = ({ children }) => {
   const [isTextVisible, setIsTextVisible] = useState(true);
   const scrollRef = useRef<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
+  const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 }); // Default size
 
   // Hardcoded config values (previously from Leva)
   const config: ConfigType = {
@@ -287,9 +278,9 @@ const App: React.FC<AppProps> = ({ children }) => {
     hoverColor: "#ffffff",
     panelOpacity: 0.4,
     maxForwardDistance: -1,
-    maxWidthIncrease: 1.6,
+    maxWidthIncrease: 4.34,
     maxWidthDecrease: 0,
-    maxHeightIncrease: 0.2,
+    maxHeightIncrease: 1.3,
     maxHeightDecrease: 0,
     falloffRate: 7,
     lerpFactor: 0.15,
@@ -302,15 +293,21 @@ const App: React.FC<AppProps> = ({ children }) => {
   };
 
   useEffect(() => {
+    // Update canvas size on mount and window resize
     const updateSize = () => {
       setCanvasSize({
         width: window.innerWidth,
-        height: window.innerWidth * (9 / 16),
+        height: window.innerWidth * (9 / 16), // Maintaining a 16:9 aspect ratio
       });
     };
 
+    // Set initial size
     updateSize();
+
+    // Add event listener
     window.addEventListener("resize", updateSize);
+
+    // Clean up
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
@@ -345,7 +342,7 @@ const App: React.FC<AppProps> = ({ children }) => {
         setTimeout(() => {
           setCurrentProject(index);
           setIsTextVisible(true);
-        }, 600);
+        }, 600); // Adjust this delay to match your animation duration
       }
     },
     [currentProject]
@@ -370,7 +367,6 @@ const App: React.FC<AppProps> = ({ children }) => {
           position: "absolute",
           top: "50%",
           left: "50%",
-          zIndex: +10,
           transform: "translate(-50%, -50%)",
         }}
       >
