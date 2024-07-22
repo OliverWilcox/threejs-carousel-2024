@@ -302,7 +302,8 @@ const App: React.FC<AppProps> = ({ children }) => {
   const scrollRef = useRef<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
-  const touchStartRef = useRef<number>(0);
+  const touchStartRef = useRef<number | null>(null);
+  const touchLastRef = useRef<number | null>(null);
 
   // Hardcoded config values (previously from Leva)
   const config: ConfigType = {
@@ -333,7 +334,7 @@ const App: React.FC<AppProps> = ({ children }) => {
     const updateSize = () => {
       setCanvasSize({
         width: window.innerWidth,
-        height: window.innerWidth * (9 / 16),
+        height: window.innerHeight,
       });
     };
 
@@ -347,27 +348,30 @@ const App: React.FC<AppProps> = ({ children }) => {
 
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
-      const scrollDelta = -event.deltaY * config.scrollSensitivity;
+      const scrollDelta = event.deltaY * config.scrollSensitivity;
       updateScroll(scrollDelta);
     };
 
     const handleTouchStart = (event: TouchEvent) => {
-      touchStartRef.current = event.touches[0].clientX;
+      touchStartRef.current = event.touches[0].clientY;
+      touchLastRef.current = event.touches[0].clientY;
     };
 
     const handleTouchMove = (event: TouchEvent) => {
-      if (touchStartRef.current === null) return;
+      event.preventDefault();
+      if (touchLastRef.current === null) return;
 
-      const touchEnd = event.touches[0].clientX;
-      const delta = touchStartRef.current - touchEnd;
+      const touchEnd = event.touches[0].clientY;
+      const delta = touchLastRef.current - touchEnd;
 
-      updateScroll(delta * config.scrollSensitivity * 6);
+      updateScroll(delta * config.scrollSensitivity * 0.5);
 
-      touchStartRef.current = touchEnd;
+      touchLastRef.current = touchEnd;
     };
 
     const handleTouchEnd = () => {
-      touchStartRef.current = 0;
+      touchStartRef.current = null;
+      touchLastRef.current = null;
     };
 
     const updateScroll = (scrollDelta: number) => {
@@ -377,21 +381,26 @@ const App: React.FC<AppProps> = ({ children }) => {
       setScrollProgress(progress);
     };
 
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener("wheel", handleWheel, { passive: false });
-      container.addEventListener("touchstart", handleTouchStart);
-      container.addEventListener("touchmove", handleTouchMove);
-      container.addEventListener("touchend", handleTouchEnd);
-    }
+    document.body.style.overflow = "hidden";
+    document.body.style.height = "100%";
+    document.documentElement.style.height = "100%";
+
+    document.addEventListener("wheel", handleWheel, { passive: false });
+    document.addEventListener("touchstart", handleTouchStart, {
+      passive: false,
+    });
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+    document.addEventListener("touchend", handleTouchEnd);
 
     return () => {
-      if (container) {
-        container.removeEventListener("wheel", handleWheel);
-        container.removeEventListener("touchstart", handleTouchStart);
-        container.removeEventListener("touchmove", handleTouchMove);
-        container.removeEventListener("touchend", handleTouchEnd);
-      }
+      document.body.style.overflow = "";
+      document.body.style.height = "";
+      document.documentElement.style.height = "";
+
+      document.removeEventListener("wheel", handleWheel);
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
     };
   }, [config.totalProjects, config.scrollMultiplier, config.scrollSensitivity]);
 
@@ -423,13 +432,11 @@ const App: React.FC<AppProps> = ({ children }) => {
         ref={containerRef}
         style={{
           width: "100%",
-          height: `${canvasSize.height}px`,
+          height: "100%",
           position: "absolute",
-          top: "50%",
-          left: "50%",
-          zIndex: +10,
-          transform: "translate(-50%, -50%)",
-          touchAction: "none", // Prevent default touch actions
+          top: 0,
+          left: 0,
+          zIndex: 10,
         }}
       >
         <Canvas
