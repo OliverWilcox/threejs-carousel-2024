@@ -334,7 +334,7 @@ const App: React.FC<AppProps> = ({ children }) => {
     const updateSize = () => {
       setCanvasSize({
         width: window.innerWidth,
-        height: window.innerWidth * (9 / 16),
+        height: window.innerHeight,
       });
     };
 
@@ -348,21 +348,21 @@ const App: React.FC<AppProps> = ({ children }) => {
 
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
-      const scrollDelta = -event.deltaY * config.scrollSensitivity; // Reversed direction
+      const scrollDelta = event.deltaY * config.scrollSensitivity;
       updateScroll(scrollDelta);
     };
 
     const handleTouchStart = (event: TouchEvent) => {
-      touchStartRef.current = event.touches[0].clientX;
-      touchLastRef.current = event.touches[0].clientX;
+      touchStartRef.current = event.touches[0].clientY;
+      touchLastRef.current = event.touches[0].clientY;
     };
 
     const handleTouchMove = (event: TouchEvent) => {
       event.preventDefault();
       if (touchLastRef.current === null) return;
 
-      const touchEnd = event.touches[0].clientX;
-      const delta = -(touchLastRef.current - touchEnd); // Reversed direction
+      const touchEnd = event.touches[0].clientY;
+      const delta = touchLastRef.current - touchEnd;
 
       updateScroll(delta * config.scrollSensitivity * 0.5);
 
@@ -382,6 +382,9 @@ const App: React.FC<AppProps> = ({ children }) => {
     };
 
     document.body.style.overflow = "hidden";
+    document.body.style.height = "100%";
+    document.documentElement.style.height = "100%";
+
     document.addEventListener("wheel", handleWheel, { passive: false });
     document.addEventListener("touchstart", handleTouchStart, {
       passive: false,
@@ -391,6 +394,9 @@ const App: React.FC<AppProps> = ({ children }) => {
 
     return () => {
       document.body.style.overflow = "";
+      document.body.style.height = "";
+      document.documentElement.style.height = "";
+
       document.removeEventListener("wheel", handleWheel);
       document.removeEventListener("touchstart", handleTouchStart);
       document.removeEventListener("touchmove", handleTouchMove);
@@ -426,11 +432,10 @@ const App: React.FC<AppProps> = ({ children }) => {
         ref={containerRef}
         style={{
           width: "100%",
-          height: `${canvasSize.height}px`,
+          height: "100%",
           position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
+          top: 0,
+          left: 0,
           zIndex: 10,
         }}
       >
