@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
-import dynamic from "next/dynamic";
-const Rectangle = dynamic(() => import("./rectangle"), { ssr: false });
-import { SceneProps } from "../types";
+import { Rectangle } from "./rectangle";
+import { SceneProps } from "./types";
 
 export const Scene: React.FC<SceneProps> = React.memo(
   ({ config, scrollProgress, onCenterFocus }) => {
@@ -39,4 +38,3 @@ export const Scene: React.FC<SceneProps> = React.memo(
 );
 
 Scene.displayName = "Scene";
-export default Scene;

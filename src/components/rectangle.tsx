@@ -7,9 +7,8 @@ import React, {
 } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
-import { RectangleProps } from "../types";
-import { lerp, calculatePosition } from "../utils";
-
+import { RectangleProps } from "./types";
+import { lerp, calculatePosition } from "./utils";
 import gsap from "gsap";
 
 // Enhanced curved shader with multiple textures and color transition
@@ -69,10 +68,8 @@ const curvedFragmentShader = `
   }
 `;
 
-const Rectangle: React.FC<RectangleProps> = React.memo(
+export const Rectangle: React.FC<RectangleProps> = React.memo(
   ({ index, totalRectangles, scrollProgress, config, onCenterFocus }) => {
-    Rectangle.displayName = "Rectangle";
-
     const mesh = useRef<THREE.Mesh>(null);
     const [hovered, setHovered] = useState(false);
     const [isCenter, setIsCenter] = useState(false);
@@ -296,4 +293,4 @@ const Rectangle: React.FC<RectangleProps> = React.memo(
   }
 );
 
-export default Rectangle;
+Rectangle.displayName = "Rectangle";

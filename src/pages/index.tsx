@@ -12,9 +12,9 @@ import * as THREE from "three";
 import gsap from "gsap";
 
 // Importing components and types
-import { Scene } from "./scene";
-import { Lights } from "./lights";
-import { AppProps, ConfigType } from "../types";
+import { Scene } from "../components/scene";
+import { Lights } from "../components/lights";
+import { AppProps, ConfigType } from "../components/types";
 
 // Nav component
 const Nav: React.FC<{ currentProject: number }> = ({ currentProject }) => {
@@ -31,7 +31,6 @@ const Nav: React.FC<{ currentProject: number }> = ({ currentProject }) => {
         justifyContent: "space-between",
         color: "black",
         zIndex: 40,
-        visibility: "hidden",
       }}
     >
       <div>Oliver Wilcox</div>
@@ -143,18 +142,20 @@ const Info: React.FC<{ currentProject: number; isVisible: boolean }> = ({
 }) => {
   const projects = [
     {
-      name: "Index 1",
-      date: "2024",
-      client: "Index 1",
+      name: "Relationship Ready",
+      date: "2021",
+      client: "Coaching",
       role: "Design and Development",
-      description: "Description 1",
+      description:
+        "Developed a new experience designed to help with building dyson spheres.",
     },
     {
-      name: "Index 2",
-      date: "2024",
-      client: "Index 2",
-      role: "Design and Development",
-      description: "Description 2",
+      name: "Multivitamin Studio",
+      date: "2023",
+      client: "Web Agency",
+      role: "Design and Creative Development",
+      description:
+        "Created an immersive web experience showcasing the latest advancements.",
     },
 
     // Add more projects as needed
@@ -275,6 +276,7 @@ const App: React.FC<AppProps> = ({ children }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
 
+  // Hardcoded config values (previously from Leva)
   const config: ConfigType = {
     totalProjects: 18,
     radius: 9.2,
