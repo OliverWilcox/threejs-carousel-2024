@@ -14,7 +14,35 @@ import gsap from "gsap";
 // Importing components and types
 import { Scene } from "../components/scene";
 import { Lights } from "../components/lights";
-import { AppProps, ConfigType } from "../components/types";
+
+// Types
+interface AppProps {
+  children?: ReactNode;
+}
+
+interface ConfigType {
+  totalProjects: number;
+  radius: number;
+  scrollMultiplier: number;
+  panelWidth: number;
+  panelHeight: number;
+  panelColor: string;
+  hoverColor: string;
+  panelOpacity: number;
+  maxForwardDistance: number;
+  maxWidthIncrease: number;
+  maxWidthDecrease: number;
+  maxHeightIncrease: number;
+  maxHeightDecrease: number;
+  falloffRate: number;
+  lerpFactor: number;
+  rotationSmoothness: number;
+  centerThreshold: number;
+  adjacentThreshold: number;
+  cameraZ: number;
+  fov: number;
+  scrollSensitivity: number;
+}
 
 // Nav component
 const Nav: React.FC<{ currentProject: number }> = ({ currentProject }) => {
@@ -135,7 +163,7 @@ const AnimatedText: React.FC<{
   );
 };
 
-// Updated Info component
+// Info component
 const Info: React.FC<{ currentProject: number; isVisible: boolean }> = ({
   currentProject,
   isVisible,
@@ -157,7 +185,6 @@ const Info: React.FC<{ currentProject: number; isVisible: boolean }> = ({
       description:
         "Created an immersive web experience showcasing the latest advancements.",
     },
-
     // Add more projects as needed
   ];
 
@@ -275,6 +302,7 @@ const App: React.FC<AppProps> = ({ children }) => {
   const scrollRef = useRef<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
+  const touchStartRef = useRef<number>(0);
 
   // Hardcoded config values (previously from Leva)
   const config: ConfigType = {
@@ -320,6 +348,29 @@ const App: React.FC<AppProps> = ({ children }) => {
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
       const scrollDelta = -event.deltaY * config.scrollSensitivity;
+      updateScroll(scrollDelta);
+    };
+
+    const handleTouchStart = (event: TouchEvent) => {
+      touchStartRef.current = event.touches[0].clientX;
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (touchStartRef.current === null) return;
+
+      const touchEnd = event.touches[0].clientX;
+      const delta = touchStartRef.current - touchEnd;
+
+      updateScroll(delta * config.scrollSensitivity * 0.5);
+
+      touchStartRef.current = touchEnd;
+    };
+
+    const handleTouchEnd = () => {
+      touchStartRef.current = 0;
+    };
+
+    const updateScroll = (scrollDelta: number) => {
       scrollRef.current += scrollDelta;
       scrollRef.current = (scrollRef.current + totalWidth) % totalWidth;
       const progress = scrollRef.current / totalWidth;
@@ -329,11 +380,17 @@ const App: React.FC<AppProps> = ({ children }) => {
     const container = containerRef.current;
     if (container) {
       container.addEventListener("wheel", handleWheel, { passive: false });
+      container.addEventListener("touchstart", handleTouchStart);
+      container.addEventListener("touchmove", handleTouchMove);
+      container.addEventListener("touchend", handleTouchEnd);
     }
 
     return () => {
       if (container) {
         container.removeEventListener("wheel", handleWheel);
+        container.removeEventListener("touchstart", handleTouchStart);
+        container.removeEventListener("touchmove", handleTouchMove);
+        container.removeEventListener("touchend", handleTouchEnd);
       }
     };
   }, [config.totalProjects, config.scrollMultiplier, config.scrollSensitivity]);
@@ -372,6 +429,7 @@ const App: React.FC<AppProps> = ({ children }) => {
           left: "50%",
           zIndex: +10,
           transform: "translate(-50%, -50%)",
+          touchAction: "none", // Prevent default touch actions
         }}
       >
         <Canvas
