@@ -334,7 +334,7 @@ const App: React.FC<AppProps> = ({ children }) => {
     const updateSize = () => {
       setCanvasSize({
         width: window.innerWidth,
-        height: window.innerHeight,
+        height: window.innerWidth * (9 / 16),
       });
     };
 
@@ -353,15 +353,15 @@ const App: React.FC<AppProps> = ({ children }) => {
     };
 
     const handleTouchStart = (event: TouchEvent) => {
-      touchStartRef.current = event.touches[0].clientY;
-      touchLastRef.current = event.touches[0].clientY;
+      touchStartRef.current = event.touches[0].clientX;
+      touchLastRef.current = event.touches[0].clientX;
     };
 
     const handleTouchMove = (event: TouchEvent) => {
       event.preventDefault();
       if (touchLastRef.current === null) return;
 
-      const touchEnd = event.touches[0].clientY;
+      const touchEnd = event.touches[0].clientX;
       const delta = touchLastRef.current - touchEnd;
 
       updateScroll(delta * config.scrollSensitivity * 0.5);
@@ -382,9 +382,6 @@ const App: React.FC<AppProps> = ({ children }) => {
     };
 
     document.body.style.overflow = "hidden";
-    document.body.style.height = "100%";
-    document.documentElement.style.height = "100%";
-
     document.addEventListener("wheel", handleWheel, { passive: false });
     document.addEventListener("touchstart", handleTouchStart, {
       passive: false,
@@ -394,9 +391,6 @@ const App: React.FC<AppProps> = ({ children }) => {
 
     return () => {
       document.body.style.overflow = "";
-      document.body.style.height = "";
-      document.documentElement.style.height = "";
-
       document.removeEventListener("wheel", handleWheel);
       document.removeEventListener("touchstart", handleTouchStart);
       document.removeEventListener("touchmove", handleTouchMove);
@@ -432,10 +426,11 @@ const App: React.FC<AppProps> = ({ children }) => {
         ref={containerRef}
         style={{
           width: "100%",
-          height: "100%",
+          height: `${canvasSize.height}px`,
           position: "absolute",
-          top: 0,
-          left: 0,
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
           zIndex: 10,
         }}
       >
