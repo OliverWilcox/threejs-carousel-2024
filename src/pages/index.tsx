@@ -348,7 +348,7 @@ const App: React.FC<AppProps> = ({ children }) => {
 
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
-      const scrollDelta = event.deltaY * config.scrollSensitivity;
+      const scrollDelta = -event.deltaY * config.scrollSensitivity; // Reversed direction
       updateScroll(scrollDelta);
     };
 
@@ -362,7 +362,7 @@ const App: React.FC<AppProps> = ({ children }) => {
       if (touchLastRef.current === null) return;
 
       const touchEnd = event.touches[0].clientX;
-      const delta = touchLastRef.current - touchEnd;
+      const delta = -(touchLastRef.current - touchEnd); // Reversed direction
 
       updateScroll(delta * config.scrollSensitivity * 0.5);
 
