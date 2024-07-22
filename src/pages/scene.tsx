@@ -26,6 +26,7 @@ export const Scene: React.FC<SceneProps> = React.memo(
             totalRectangles={totalRectangles}
             scrollProgress={scrollProgress}
             config={config}
+            animationIntensity={animationIntensity}
             onCenterFocus={onCenterFocus}
           />
         );

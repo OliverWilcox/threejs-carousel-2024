@@ -275,7 +275,6 @@ const App: React.FC<AppProps> = ({ children }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
 
-  // Hardcoded config values (previously from Leva)
   const config: ConfigType = {
     totalProjects: 18,
     radius: 9.2,

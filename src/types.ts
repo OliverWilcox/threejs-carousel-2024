@@ -37,5 +37,6 @@ export interface RectangleProps {
   totalRectangles: number;
   scrollProgress: number;
   config: ConfigType;
+  animationIntensity: number;
   onCenterFocus: (index: number) => void;
 }
