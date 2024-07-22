@@ -375,7 +375,7 @@ const App: React.FC<AppProps> = ({ children }) => {
       const touchEnd = event.touches[0].clientY;
       const delta = touchLastRef.current - touchEnd;
 
-      updateScroll(delta * config.scrollSensitivity * 6);
+      updateScroll(delta * config.scrollSensitivity * 4);
 
       touchLastRef.current = touchEnd;
     };
