@@ -334,7 +334,7 @@ const App: React.FC<AppProps> = ({ children }) => {
     const updateSize = () => {
       setCanvasSize({
         width: window.innerWidth,
-        height: window.innerHeight,
+        height: window.innerWidth * (9 / 16),
       });
     };
 
@@ -364,7 +364,7 @@ const App: React.FC<AppProps> = ({ children }) => {
       const touchEnd = event.touches[0].clientY;
       const delta = touchLastRef.current - touchEnd;
 
-      updateScroll(delta * config.scrollSensitivity * 0.5);
+      updateScroll(delta * config.scrollSensitivity * 10);
 
       touchLastRef.current = touchEnd;
     };
@@ -432,10 +432,11 @@ const App: React.FC<AppProps> = ({ children }) => {
         ref={containerRef}
         style={{
           width: "100%",
-          height: "100%",
+          height: `${canvasSize.height}px`,
           position: "absolute",
-          top: 0,
-          left: 0,
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
           zIndex: 10,
         }}
       >
