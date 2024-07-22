@@ -86,3 +86,5 @@ export const Info: React.FC<InfoProps> = ({ currentProject }) => {
     </div>
   );
 };
+
+export default Nav;

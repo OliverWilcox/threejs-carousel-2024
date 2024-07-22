@@ -7,3 +7,5 @@ export const Lights: React.FC = React.memo(() => (
   </>
 ));
 Lights.displayName = "Lights";
+
+export default Lights;

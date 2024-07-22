@@ -38,3 +38,4 @@ export const Scene: React.FC<SceneProps> = React.memo(
 );
 
 Scene.displayName = "Scene";
+export default Scene;
