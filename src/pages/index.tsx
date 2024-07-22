@@ -304,6 +304,7 @@ const App: React.FC<AppProps> = ({ children }) => {
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
   const touchStartRef = useRef<number | null>(null);
   const touchLastRef = useRef<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Hardcoded config values (previously from Leva)
   const config: ConfigType = {
@@ -344,6 +345,16 @@ const App: React.FC<AppProps> = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768); // Adjust this threshold as needed
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  useEffect(() => {
     const totalWidth = config.totalProjects * config.scrollMultiplier;
 
     const handleWheel = (event: WheelEvent) => {
@@ -364,7 +375,7 @@ const App: React.FC<AppProps> = ({ children }) => {
       const touchEnd = event.touches[0].clientY;
       const delta = touchLastRef.current - touchEnd;
 
-      updateScroll(delta * config.scrollSensitivity * 10);
+      updateScroll(delta * config.scrollSensitivity * 0.5);
 
       touchLastRef.current = touchEnd;
     };
@@ -442,7 +453,10 @@ const App: React.FC<AppProps> = ({ children }) => {
       >
         <Canvas
           shadows
-          camera={{ position: [0, 0, config.cameraZ], fov: 120 }}
+          camera={{
+            position: [0, 0, config.cameraZ],
+            fov: isMobile ? 80 : 120,
+          }}
           style={{
             width: "100%",
             height: "100%",
