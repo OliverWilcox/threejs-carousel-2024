@@ -54,11 +54,12 @@ const Nav: React.FC<{ currentProject: number }> = ({ currentProject }) => {
         left: 0,
         right: 0,
         padding: "20px",
-        display: "flex",
+
         fontSize: "16px",
         justifyContent: "space-between",
         color: "black",
         zIndex: 40,
+        display: "none",
       }}
     >
       <div>Oliver Wilcox</div>
