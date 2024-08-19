@@ -15,6 +15,7 @@ export interface RectangleProps {
   scrollProgress: number;
   config: ConfigType;
   animationIntensity: number;
+  isAdjacent: boolean;
 }
 
 export interface ConfigType {

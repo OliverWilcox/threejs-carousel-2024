@@ -18,6 +18,7 @@ export const Scene: React.FC<SceneProps> = React.memo(
           0,
           1 - distance / (totalRectangles / 4)
         );
+        const isAdjacent = distance === 100;
 
         return (
           <Rectangle
@@ -28,6 +29,7 @@ export const Scene: React.FC<SceneProps> = React.memo(
             config={config}
             animationIntensity={animationIntensity}
             onCenterFocus={onCenterFocus}
+            isAdjacent={isAdjacent}
           />
         );
       });

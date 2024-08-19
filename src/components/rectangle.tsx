@@ -11,18 +11,25 @@ import { RectangleProps } from "./types";
 import { lerp, calculatePosition } from "./utils";
 import gsap from "gsap";
 
-// Enhanced curved shader with multiple textures and color transition
+// SHADER CODE
+// These shaders create the curved effect and handle texturing
+
+// Vertex shader: Creates the curved shape of the rectangle
+// Customization: Adjust the 'curvature' uniform to change the curve intensity
 const curvedVertexShader = `
   uniform float curvature;
   varying vec2 vUv;
   void main() {
     vUv = uv;
     vec3 pos = position;
+    // Change the sign here to curve inward or outward
     float z = pos.z + curvature * pow(abs(pos.x), 2.0);
     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos.x, pos.y, z, 1.0);
   }
 `;
 
+// Fragment shader: Handles texturing, color transitions, and opacity
+// Customization: Modify color calculations, add effects, or change the grayscale algorithm
 const curvedFragmentShader = `
   uniform vec3 color;
   uniform float opacity;
@@ -35,12 +42,13 @@ const curvedFragmentShader = `
   varying vec2 vUv;
 
   vec4 toGrayscale(vec4 color) {
+    // Customize this function to change how grayscale is calculated
     float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
     return vec4(gray, gray, gray, color.a);
   }
 
   void main() {
-    // Calculate aspect ratios
+    // Calculate aspect ratios for texture fitting
     float texAspect = textureSize.x / textureSize.y;
     float planeAspect = planeSize.x / planeSize.y;
     
@@ -54,6 +62,8 @@ const curvedFragmentShader = `
       adjustedUV.x = (vUv.x - 0.5) * scale + 0.5;
     }
 
+    // Select texture based on index
+    // Customization: Add more texture options or change selection logic
     vec4 texColor;
     if (textureIndex == 0) texColor = texture2D(diffuseTextures[0], adjustedUV);
     else if (textureIndex == 1) texColor = texture2D(diffuseTextures[1], adjustedUV);
@@ -61,6 +71,7 @@ const curvedFragmentShader = `
     else texColor = texture2D(diffuseTextures[3], adjustedUV);
     
     // Apply grayscale with smooth transition
+    // Customization: Modify this to change the color transition effect
     vec4 grayColor = toGrayscale(texColor);
     texColor = mix(grayColor, texColor, colorTransition);
     
@@ -68,34 +79,45 @@ const curvedFragmentShader = `
   }
 `;
 
+// MAIN COMPONENT
 export const Rectangle: React.FC<RectangleProps> = React.memo(
   ({ index, totalRectangles, scrollProgress, config, onCenterFocus }) => {
+    // Refs and state
     const mesh = useRef<THREE.Mesh>(null);
     const [hovered, setHovered] = useState(false);
     const [isCenter, setIsCenter] = useState(false);
 
+    // Memoized values for performance
     const currentPosition = useMemo(() => new THREE.Vector3(), []);
     const currentRotation = useMemo(() => new THREE.Euler(), []);
     const currentScale = useMemo(() => new THREE.Vector3(1, 1, 1), []);
 
+    // Refs for animation and transitions
     const prevAngleRef = useRef(0);
     const isCenterRef = useRef(false);
     const transitionTimeRef = useRef(0);
     const opacityRef = useRef(config.panelOpacity);
     const colorTransitionRef = useRef({ value: 0 });
+    const scaleTransitionRef = useRef({ width: 1, height: 1 });
+    const curvatureRef = useRef({ value: -3 });
+    const scaleAnimationRef = useRef<gsap.core.Tween | null>(null);
+    const curvatureAnimationRef = useRef<gsap.core.Tween | null>(null);
 
-    // Load dummy textures
+    // Load textures
+    // Customization: Replace these with your own textures or dynamically load them
     const dummyTextures = useLoader(THREE.TextureLoader, [
-      "city.jpg",
-      "mountain.jpg",
-      "city.jpg",
-      "mountain.jpg",
+      "y2k1.jpg",
+      "y2k3.jpg",
+      "y2k1.jpg",
+      "y2k3.jpg",
     ]);
 
+    // Create shader material
+    // Customization: Modify uniform values or add new uniforms for additional effects
     const curvedShaderMaterial = useMemo(() => {
       return new THREE.ShaderMaterial({
         uniforms: {
-          curvature: { value: 0.1 },
+          curvature: { value: -3 },
           color: { value: new THREE.Color(config.panelColor) },
           opacity: { value: config.panelOpacity },
           diffuseTextures: { value: dummyTextures },
@@ -126,20 +148,28 @@ export const Rectangle: React.FC<RectangleProps> = React.memo(
       index,
     ]);
 
+    // Setup and cleanup GSAP timeline
     useEffect(() => {
-      const tl = gsap.timeline();
       return () => {
-        tl.kill();
+        if (scaleAnimationRef.current) {
+          scaleAnimationRef.current.kill();
+        }
+        if (curvatureAnimationRef.current) {
+          curvatureAnimationRef.current.kill();
+        }
       };
     }, []);
 
+    // Main animation frame
     useFrame((state, delta) => {
       if (!mesh.current) return;
 
+      // Calculate angle for this rectangle
       const angleStep = (Math.PI * 2) / totalRectangles;
       const scrolledAngle =
         index * angleStep - scrollProgress * totalRectangles * angleStep;
 
+      // Determine if this rectangle is at the center back
       const distanceFromCenter = Math.abs(
         Math.atan2(Math.sin(scrolledAngle), -Math.cos(scrolledAngle))
       );
@@ -155,18 +185,28 @@ export const Rectangle: React.FC<RectangleProps> = React.memo(
       );
 
       const newIsCenter = distanceFromCenterBackPanel === 0 && isOnBack;
+
+      // Handle center state change
       if (newIsCenter !== isCenter) {
         setIsCenter(newIsCenter);
         if (newIsCenter) {
           onCenterFocus(index);
         }
 
-        // Animate color transition with delay
+        // Kill any ongoing animations
+        if (scaleAnimationRef.current) {
+          scaleAnimationRef.current.kill();
+        }
+        if (curvatureAnimationRef.current) {
+          curvatureAnimationRef.current.kill();
+        }
+
+        // Animate color transition
         gsap.to(colorTransitionRef.current, {
           value: newIsCenter ? 1 : 0,
-          duration: 1,
-          delay: 0.3,
-          ease: "in out",
+          duration: 0.2,
+          delay: 0,
+          ease: "power2.inOut",
           onUpdate: () => {
             if (curvedShaderMaterial.uniforms) {
               curvedShaderMaterial.uniforms.colorTransition.value =
@@ -174,12 +214,48 @@ export const Rectangle: React.FC<RectangleProps> = React.memo(
             }
           },
         });
+
+        if (newIsCenter) {
+          // Animate width and height scale with delay when becoming the center
+          scaleAnimationRef.current = gsap.to(scaleTransitionRef.current, {
+            width: 1 + config.maxWidthIncrease,
+            height: 1 + config.maxHeightIncrease,
+            duration: 0.25,
+            delay: 0.5,
+            ease: "power2.inOut",
+          });
+
+          // Animate curvature transition when becoming center
+          curvatureAnimationRef.current = gsap.to(curvatureRef.current, {
+            value: 0.25,
+            duration: 0.5,
+            delay: 0.5,
+            ease: "power2.inOut",
+          });
+        } else {
+          // Immediate transition back to normal size
+          gsap.to(scaleTransitionRef.current, {
+            width: 1,
+            height: 1,
+            duration: 0.5,
+            ease: "power2.inOut",
+          });
+
+          // Immediate transition back to normal curvature
+          gsap.to(curvatureRef.current, {
+            value: -3,
+            duration: 0.5,
+            ease: "power2.inOut",
+          });
+        }
       }
 
       // Width transition parameters
-      const transitionDelay = 0.1;
-      const transitionDuration = 0.2;
+      // Customization: Adjust these values for different transition speeds
+      const transitionDelay = 0.2;
+      const transitionDuration = 0.5;
 
+      // Handle transition timing
       if (newIsCenter && !isCenterRef.current) {
         transitionTimeRef.current = -transitionDelay;
         isCenterRef.current = true;
@@ -193,6 +269,7 @@ export const Rectangle: React.FC<RectangleProps> = React.memo(
         transitionDuration
       );
 
+      // Calculate transition progress
       let transitionProgress;
       if (newIsCenter) {
         transitionProgress =
@@ -202,24 +279,25 @@ export const Rectangle: React.FC<RectangleProps> = React.memo(
       }
       transitionProgress = Math.min(Math.max(transitionProgress, 0), 1);
 
+      // Calculate forward offset
+      // Customization: Modify this calculation to change how panels move forward
       let forwardOffset =
         config.maxForwardDistance *
         Math.exp(-distanceFromCenter * config.falloffRate);
-
-      // Updated width and height scale calculations
-      let widthScale = 1 + config.maxWidthIncrease * transitionProgress;
-      let heightScale = 1 + config.maxHeightIncrease * transitionProgress;
 
       if (newIsCenter || isCenterRef.current) {
         forwardOffset += config.maxForwardDistance * transitionProgress;
       }
 
+      // Calculate position
       const targetPosition = calculatePosition(
         scrolledAngle,
         config.radius,
         forwardOffset
       );
 
+      // Calculate rotation
+      // Customization: Modify rotation calculation for different orientations
       let targetAngle = Math.atan2(targetPosition.x, targetPosition.z);
       const prevAngle = prevAngleRef.current;
       const angleDiff =
@@ -228,8 +306,14 @@ export const Rectangle: React.FC<RectangleProps> = React.memo(
       prevAngleRef.current = newAngle;
 
       const targetRotation = new THREE.Euler(0, newAngle, 0);
-      const targetScale = new THREE.Vector3(widthScale, heightScale, 1);
+      const targetScale = new THREE.Vector3(
+        scaleTransitionRef.current.width,
+        scaleTransitionRef.current.height,
+        1
+      );
 
+      // Interpolate position, rotation, and scale
+      // Customization: Adjust lerpFactor in config for smoother or more immediate transitions
       currentPosition.lerp(targetPosition, config.lerpFactor);
       currentRotation.set(
         lerp(currentRotation.x, targetRotation.x, config.lerpFactor),
@@ -238,21 +322,24 @@ export const Rectangle: React.FC<RectangleProps> = React.memo(
       );
       currentScale.lerp(targetScale, config.lerpFactor);
 
+      // Apply transformations
       mesh.current.position.copy(currentPosition);
       mesh.current.rotation.copy(currentRotation);
       mesh.current.scale.copy(currentScale);
 
-      // Calculate target opacity with more pronounced staggering
+      // Calculate opacity
+      // Customization: Modify this calculation for different opacity effects
       const quarterTotalRectangles = totalRectangles / 2.6;
       const opacityFactor = Math.pow(
         1 - distanceFromCenterBackPanel / quarterTotalRectangles,
-        2
+        5
       );
       const targetOpacity = newIsCenter
         ? 0.8
         : config.panelOpacity * Math.max(opacityFactor, 0);
 
-      // Smoothly animate opacity change
+      // Animate opacity change
+      // Customization: Adjust duration or easing function for different fade effects
       gsap.to(opacityRef, {
         current: targetOpacity,
         duration: 0.3,
@@ -264,11 +351,11 @@ export const Rectangle: React.FC<RectangleProps> = React.memo(
         },
       });
 
-      // Update curved shader uniforms
+      // Update shader uniforms
+      // Customization: Modify these values or add new uniforms for different visual effects
       if (curvedShaderMaterial.uniforms) {
-        curvedShaderMaterial.uniforms.curvature.value = newIsCenter
-          ? 0.1 * transitionProgress
-          : 0;
+        curvedShaderMaterial.uniforms.curvature.value =
+          curvatureRef.current.value;
         curvedShaderMaterial.uniforms.color.value.setStyle(
           hovered ? config.hoverColor : config.panelColor
         );
@@ -277,9 +364,11 @@ export const Rectangle: React.FC<RectangleProps> = React.memo(
       }
     });
 
+    // Event handlers
     const handlePointerOver = useCallback(() => setHovered(true), []);
     const handlePointerOut = useCallback(() => setHovered(false), []);
 
+    // Render
     return (
       <mesh
         ref={mesh}

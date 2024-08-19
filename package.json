@@ -22,6 +22,7 @@
     "raw-loader": "^4.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.26.1",
     "three": "^0.161.0",
     "three-custom-shader-material": "5.4"
   },

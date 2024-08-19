@@ -55,7 +55,7 @@ const Nav: React.FC<{ currentProject: number }> = ({ currentProject }) => {
         right: 0,
         padding: "20px",
 
-        fontSize: "16px",
+        fontSize: "12px",
         justifyContent: "space-between",
         color: "black",
         zIndex: 40,
@@ -88,9 +88,9 @@ const AnimatedText: React.FC<{
   splitLines = false,
   animationKey,
   isVisible,
-  fontSize = "16px",
+  fontSize = "12px",
   lineHeight = "1.8em",
-  delay = 0.2,
+  delay = 0,
   lines = 1,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -113,17 +113,16 @@ const AnimatedText: React.FC<{
             y: "0%",
             opacity: 1,
             duration: 0.6,
-            delay: 0.3,
+
             ease: "expo.out",
-            stagger: 0.025,
           });
       } else {
         animationRef.current.to(elements, {
-          y: "80%",
+          y: "-80%",
           opacity: 0,
-          duration: 0.5,
+
+          duration: 0.3,
           ease: "expo.in",
-          stagger: 0.025,
         });
       }
     }
@@ -164,134 +163,115 @@ const AnimatedText: React.FC<{
   );
 };
 
-// Info component
 const Info: React.FC<{ currentProject: number; isVisible: boolean }> = ({
   currentProject,
   isVisible,
 }) => {
   const projects = [
     {
-      name: "Relationship Ready",
-      date: "2021",
-      client: "Coaching",
-      role: "Design and Development",
-      description:
-        "Developed a new experience designed to help with building dyson spheres.",
-    },
-    {
-      name: "Multivitamin Studio",
+      name: "MULTIVITAMIN STUDIO",
       date: "2023",
-      client: "Web Agency",
-      role: "Design and Creative Development",
+      brand: "WEB AGENCY",
+      role: "DESIGN AND CREATIVE DEVELOPMENT",
+
       description:
-        "Created an immersive web experience showcasing the latest advancements.",
+        "CREATED AN IMMERSIVE WEB EXPERIENCE SHOWCASING THE LATEST ADVANCEMENTS IN TECHNOLOGY AND DESIGN.",
     },
     // Add more projects as needed
   ];
 
   const project = projects[currentProject % projects.length];
-  const projectNameLineHeight = hasDescendingLetters(project.name)
-    ? "5.4em"
-    : "5.05em";
+
+  const fields = ["name", "date", "brand", "role", "description"];
+
+  const getColumnWidth = (field: string) => {
+    switch (field) {
+      case "name":
+        return "14%";
+      case "date":
+        return "3%";
+      case "brand":
+        return "8%";
+      case "role":
+        return "15%";
+      case "location":
+        return "5%";
+      case "description":
+        return "40%";
+      default:
+        return "auto";
+    }
+  };
 
   return (
-    <>
-      {/* Centered project name */}
-      <div
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          textAlign: "center",
-          zIndex: 10,
-          display: "none",
-        }}
-      >
-        <AnimatedText
-          lineHeight={projectNameLineHeight}
-          animationKey={currentProject}
-          isVisible={isVisible}
-          fontSize="64px"
-          delay={0}
+    <div
+      style={{
+        position: "fixed",
+        bottom: "20px",
+        left: "20px",
+        right: "20%",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "flex-end",
+        color: "black",
+        zIndex: 10,
+        textTransform: "uppercase",
+      }}
+    >
+      {fields.map((field) => (
+        <div
+          key={field}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            width: getColumnWidth(field),
+            marginRight: "10px",
+          }}
         >
-          {project.name}
-        </AnimatedText>
-      </div>
-
-      {/* Bottom left text */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          left: "20px",
-          color: "black",
-          zIndex: 10,
-          visibility: "hidden",
-        }}
-      >
-        <AnimatedText
-          animationKey="developer-designer"
-          isVisible={isVisible}
-          fontSize="16px"
-        >
-          Developer and Designer
-        </AnimatedText>
-      </div>
-
-      {/* Bottom centered description */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          textAlign: "center",
-          color: "black",
-          zIndex: 10,
-          width: "30%",
-          maxWidth: "400px",
-          visibility: "hidden",
-        }}
-      >
-        <AnimatedText
-          animationKey={currentProject}
-          isVisible={isVisible}
-          fontSize="13px"
-          lineHeight="1.2em"
-          lines={3}
-        >
-          {project.description}
-        </AnimatedText>
-      </div>
-
-      {/* Bottom right aligned details */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
-          textAlign: "right",
-          color: "black",
-          zIndex: 10,
-        }}
-      >
-        {["date", "client", "role"].map((field) => (
-          <AnimatedText
-            key={field}
-            animationKey={`${currentProject}-${field}`}
-            isVisible={isVisible}
-            fontSize="13px"
-            lineHeight="1.2em"
+          <div
+            style={{
+              fontSize: "11px",
+              lineHeight: "0.2em",
+              opacity: 0.5,
+              marginBottom: "8px",
+              height: "14px", // Fixed height for label
+            }}
           >
-            <span style={{ opacity: 0.5 }}>
-              {field.charAt(0).toUpperCase() + field.slice(1)}:
-            </span>{" "}
-            {project[field as keyof typeof project]}
-          </AnimatedText>
-        ))}
-      </div>
-    </>
+            {field.toUpperCase()}
+          </div>
+          <div
+            style={{
+              fontSize: "12px",
+              lineHeight: "1.2em",
+              position: "relative",
+              bottom: "0",
+
+              display: "flex",
+              height: "30px",
+              flexDirection: "column",
+              justifyContent: "flex-start", // Align content to bottom
+            }}
+          >
+            <AnimatedText
+              animationKey={`${currentProject}-${field}`}
+              isVisible={isVisible}
+              fontSize="12px"
+              lineHeight="30px"
+            >
+              <div
+                style={{
+                  position: "absolute",
+
+                  bottom: "-30px",
+                }}
+              >
+                {project[field as keyof typeof project]}
+              </div>
+            </AnimatedText>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 };
 
@@ -306,21 +286,22 @@ const App: React.FC<AppProps> = ({ children }) => {
   const touchStartRef = useRef<number | null>(null);
   const touchLastRef = useRef<number | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const isAutoScrollingRef = useRef(false);
 
   // Hardcoded config values (previously from Leva)
   const config: ConfigType = {
     totalProjects: 18,
-    radius: 9.2,
-    scrollMultiplier: 180,
-    panelWidth: 2.9,
+    radius: 10,
+    scrollMultiplier: 160,
+    panelWidth: 2,
     panelHeight: 3.5,
     panelColor: "#ffffff",
     hoverColor: "#ffffff",
     panelOpacity: 0.4,
     maxForwardDistance: -1,
-    maxWidthIncrease: 1.6,
+    maxWidthIncrease: 2.2,
     maxWidthDecrease: 0,
-    maxHeightIncrease: 0.2,
+    maxHeightIncrease: 0,
     maxHeightDecrease: 0,
     falloffRate: 7,
     lerpFactor: 0.15,
@@ -332,6 +313,8 @@ const App: React.FC<AppProps> = ({ children }) => {
     scrollSensitivity: 0.16,
   };
 
+  // Array of background colors for each project
+  const backgroundColors = ["#E3E5EF", "#E9F1FF"];
   useEffect(() => {
     const updateSize = () => {
       setCanvasSize({
@@ -416,14 +399,76 @@ const App: React.FC<AppProps> = ({ children }) => {
     };
   }, [config.totalProjects, config.scrollMultiplier, config.scrollSensitivity]);
 
+  const bgAnimationRef = useRef<gsap.core.Tween | null>(null);
+  const [backgroundColor, setBackgroundColor] = useState("#ffffff");
+  const lastScrollTime = useRef(Date.now());
+  const isScrolling = useRef(false);
+  const handleScroll = useCallback(() => {
+    lastScrollTime.current = Date.now();
+    if (!isScrolling.current) {
+      isScrolling.current = true;
+      if (bgAnimationRef.current) {
+        bgAnimationRef.current.kill();
+      }
+      bgAnimationRef.current = gsap.to(containerRef.current, {
+        backgroundColor: "#ffffff",
+        duration: 0.3,
+        ease: "power2.out",
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const checkScrollEnd = () => {
+      if (Date.now() - lastScrollTime.current > 150) {
+        isScrolling.current = false;
+      } else {
+        requestAnimationFrame(checkScrollEnd);
+      }
+    };
+
+    window.addEventListener("wheel", handleScroll);
+    window.addEventListener("touchmove", handleScroll);
+
+    return () => {
+      window.removeEventListener("wheel", handleScroll);
+      window.removeEventListener("touchmove", handleScroll);
+    };
+  }, [handleScroll]);
+
   const handleCenterFocus = useCallback(
     (index: number) => {
       if (index !== currentProject) {
         setIsTextVisible(false);
-        setTimeout(() => {
-          setCurrentProject(index);
-          setIsTextVisible(true);
-        }, 600);
+
+        // Kill any ongoing background animation
+        if (bgAnimationRef.current) {
+          bgAnimationRef.current.kill();
+        }
+
+        // Animate background color out
+        bgAnimationRef.current = gsap.to(containerRef.current, {
+          backgroundColor: "#ffffff",
+          duration: 0.2,
+          ease: "power2.in",
+          onComplete: () => {
+            setCurrentProject(index);
+            const newColor = backgroundColors[index % backgroundColors.length];
+            setBackgroundColor(newColor);
+
+            // Animate background color in with delay
+            bgAnimationRef.current = gsap.to(containerRef.current, {
+              backgroundColor: newColor,
+              duration: 1,
+              delay: 0.25, // 0.5-second delay added here
+              ease: "power2.inOut",
+              onStart: () => {
+                // Set text to visible slightly before the background transition completes
+                gsap.delayedCall(0.2, () => setIsTextVisible(true));
+              },
+            });
+          },
+        });
       }
     },
     [currentProject]
@@ -436,6 +481,7 @@ const App: React.FC<AppProps> = ({ children }) => {
         height: "100vh",
         position: "relative",
         overflow: "hidden",
+        backgroundColor: backgroundColor,
       }}
     >
       <Nav currentProject={currentProject} />
@@ -444,11 +490,10 @@ const App: React.FC<AppProps> = ({ children }) => {
         ref={containerRef}
         style={{
           width: "100%",
-          height: `${canvasSize.height}px`,
+          height: `100%`,
           position: "absolute",
           top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
+          transform: "translateY(-50%)",
           zIndex: 10,
         }}
       >
@@ -456,11 +501,10 @@ const App: React.FC<AppProps> = ({ children }) => {
           shadows
           camera={{
             position: [0, 0, config.cameraZ],
-            fov: isMobile ? 85 : 120,
+            fov: isMobile ? 85 : 135,
           }}
           style={{
-            width: "100%",
-            height: "100%",
+            width: "100vw",
           }}
         >
           <Suspense fallback={null}>
