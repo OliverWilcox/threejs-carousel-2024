@@ -99,7 +99,7 @@ export const Rectangle: React.FC<RectangleProps> = React.memo(
     const opacityRef = useRef(config.panelOpacity);
     const colorTransitionRef = useRef({ value: 0 });
     const scaleTransitionRef = useRef({ width: 1, height: 1 });
-    const curvatureRef = useRef({ value: -3 });
+    const curvatureRef = useRef({ value: -2 });
     const scaleAnimationRef = useRef<gsap.core.Tween | null>(null);
     const curvatureAnimationRef = useRef<gsap.core.Tween | null>(null);
 
@@ -117,7 +117,7 @@ export const Rectangle: React.FC<RectangleProps> = React.memo(
     const curvedShaderMaterial = useMemo(() => {
       return new THREE.ShaderMaterial({
         uniforms: {
-          curvature: { value: -3 },
+          curvature: { value: -2 },
           color: { value: new THREE.Color(config.panelColor) },
           opacity: { value: config.panelOpacity },
           diffuseTextures: { value: dummyTextures },
@@ -243,7 +243,7 @@ export const Rectangle: React.FC<RectangleProps> = React.memo(
 
           // Immediate transition back to normal curvature
           gsap.to(curvatureRef.current, {
-            value: -3,
+            value: -2,
             duration: 0.5,
             ease: "power2.inOut",
           });

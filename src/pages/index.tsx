@@ -112,8 +112,8 @@ const AnimatedText: React.FC<{
           .to(elements, {
             y: "0%",
             opacity: 1,
-            duration: 0.6,
-
+            duration: 0.5,
+            delay: 0.2,
             ease: "expo.out",
           });
       } else {
@@ -121,8 +121,8 @@ const AnimatedText: React.FC<{
           y: "-80%",
           opacity: 0,
 
-          duration: 0.3,
-          ease: "expo.in",
+          duration: 0.4,
+          ease: "in out",
         });
       }
     }
@@ -169,20 +169,29 @@ const Info: React.FC<{ currentProject: number; isVisible: boolean }> = ({
 }) => {
   const projects = [
     {
+      index: "001",
       name: "MULTIVITAMIN STUDIO",
       date: "2023",
       brand: "WEB AGENCY",
       role: "DESIGN AND CREATIVE DEVELOPMENT",
-
       description:
         "CREATED AN IMMERSIVE WEB EXPERIENCE SHOWCASING THE LATEST ADVANCEMENTS IN TECHNOLOGY AND DESIGN.",
+    },
+    {
+      index: "002",
+      name: "RELATIONSHIP READY",
+      date: "2021",
+      brand: "COACHING",
+      role: "DESIGN AND CREATIVE DEVELOPMENT",
+      description:
+        "A program designed to help with relationship problems and build confidence within yourself.",
     },
     // Add more projects as needed
   ];
 
   const project = projects[currentProject % projects.length];
 
-  const fields = ["name", "date", "brand", "role", "description"];
+  const fields = ["index", "name", "date", "brand", "role", "description"];
 
   const getColumnWidth = (field: string) => {
     switch (field) {
@@ -298,8 +307,8 @@ const App: React.FC<AppProps> = ({ children }) => {
     panelColor: "#ffffff",
     hoverColor: "#ffffff",
     panelOpacity: 0.4,
-    maxForwardDistance: -1,
-    maxWidthIncrease: 2.2,
+    maxForwardDistance: -1.1,
+    maxWidthIncrease: 2,
     maxWidthDecrease: 0,
     maxHeightIncrease: 0,
     maxHeightDecrease: 0,
@@ -459,12 +468,12 @@ const App: React.FC<AppProps> = ({ children }) => {
             // Animate background color in with delay
             bgAnimationRef.current = gsap.to(containerRef.current, {
               backgroundColor: newColor,
-              duration: 1,
-              delay: 0.25, // 0.5-second delay added here
+              duration: 0.8,
+              delay: 0, // 0.5-second delay added here
               ease: "power2.inOut",
               onStart: () => {
                 // Set text to visible slightly before the background transition completes
-                gsap.delayedCall(0.2, () => setIsTextVisible(true));
+                gsap.delayedCall(0.4, () => setIsTextVisible(true));
               },
             });
           },
@@ -501,7 +510,7 @@ const App: React.FC<AppProps> = ({ children }) => {
           shadows
           camera={{
             position: [0, 0, config.cameraZ],
-            fov: isMobile ? 85 : 135,
+            fov: isMobile ? 85 : 140,
           }}
           style={{
             width: "100vw",
